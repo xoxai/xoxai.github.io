@@ -2,10 +2,15 @@
 <html>
 <head>
     <title>Test</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <script src="json_input.js"></script>
+    <script>
+        renderTable(data.slice(1, 11));
+    </script>
     <style>
         body {
             position: relative;
+            font-family: 'Roboto', sans-serif;
         }
 
         table, th, td {
@@ -15,7 +20,7 @@
 
         th {
             font-weight: bold;
-            background-color: #cecece;
+            background-color: #ff9999;
             text-align: center;
         }
 
@@ -97,6 +102,28 @@
         width: 50%;
         margin: 0 auto;
     }
+
+    #navigator {
+        margin: 0 auto;
+        margin-bottom: 10px;
+        text-align: center;
+        font-size: 140%;
+    }
+
+    .paginator {
+        display: inline-block;
+        margin: 5px;
+        border-radius: 30px;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        cursor: pointer;
+        padding: 5px;
+        background: orange;
+        color: white;
+        font-weight: bold;
+    }
     </style>
 </head>
 <body>
@@ -107,6 +134,8 @@
 
     <!-- Scipt goes here -->
     <script>
+
+    let originalData = data;
 
     function renderTable(data, sort=null) {
 
@@ -126,6 +155,7 @@
             if (sort == 'eyeColor') {
                 data = data.sort(function(a, b) {return a.eyeColor.localeCompare(b.eyeColor);} )
             }
+            data = data.slice(0, 10);
         }
 
         // get container element
@@ -148,6 +178,22 @@
         // close table tag
         html += '</table>';
 
+        nav = '<div id="navigator">Page: ';
+
+        perPage = 10;
+        pagesNum = Math.floor(originalData.length/perPage);
+
+        for (var i=0; i<pagesNum; i++) {
+            // 0, 10; 10, 20, 20, 30 
+            nav += '<div class="paginator" onClick="renderTable(data.slice(' + i*perPage + ',' + 
+                perPage*(i+1) + '));">' + (i+1) + '</div>';
+        }
+
+        nav += '</div>';
+
+        html = nav + html;
+        //alert(nav);
+
         // put html code into container element
         container.innerHTML = html;
 
@@ -165,6 +211,7 @@
         for (word of str.split(' ')) {
             tmp += word + ' ';
             el.textContent = tmp;
+            // HOW THE FUCK IS THIS WORKS?
             // some magical pixel constant here-\/-
             if (el.clientWidth > td.clientWidth-35) {
                 stringsCounter++;
@@ -218,7 +265,7 @@
         editor.innerHTML = htmlForm;
     }
 
-    renderTable(data);
+    renderTable(data.slice(0, 10));
 
     </script>
 
