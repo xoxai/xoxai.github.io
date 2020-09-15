@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test</title>
+    <script src="json_input.js"></script>
+    <style>
+        body {
+            position: relative;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th {
+            font-weight: bold;
+            background-color: #cecece;
+            text-align: center;
+        }
+
+        td {
+            padding: 10px;
+            text-align: justify;
+        }
+
+        td.about {
+            position: relative;
+        }
+
+        html {
+            --lh: 1.4rem;
+            line-height: var(--lh);
+        }
+
+/* ----------------------------------------- */
+/* Simple CSS Solution for truncated strings */
+/* -----------------------------------------
+
+        .truncate-overflow {
+            --max-lines: 2;
+            max-height: calc(var(--lh) * var(--max-lines));
+            overflow: hidden;
+        }
+
+        .truncate-overflow::before {
+            content: "...";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }        
+
+        .truncate-overflow::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            width: 1rem;
+            height: 1rem;
+            background: white; 
+        }
+*/
+
+    span.link {
+        color: blue;
+        text-decoration: underline;
+    }
+
+    span.link:hover {
+        text-decoration: none;
+        cursor: pointer;
+    }
+    
+    #calculator {
+        position: absolute;
+        visibility: hidden;
+        height: auto;
+        width: auto;
+        white-space: nowrap;
+    }
+
+    #editor {
+        width: 20%;
+        float: right;
+        position: fixed;
+        right: 0;
+        top: 100px;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        visibility: hidden;
+        text-align: center;
+        border: 1px solid orange
+    }
+
+    #container {
+        position: relative;
+        width: 50%;
+        margin: 0 auto;
+    }
+    </style>
+</head>
+<body>
+    <h1 align="center">Employees</h1>
+    <div id="container"></div>
+    <div id="editor"></div>
+    <div id="calculator"></div>
+
+    <!-- Scipt goes here -->
+    <script>
+
+    function renderTable(data, sort=null) {
+
+        if (sort != null) {
+            if (sort == 'name') {
+                data = data.sort(function(a, b) {return a.name.firstName.localeCompare(b.name.firstName);} )
+            }
+
+            if (sort == 'phone') {
+                data = data.sort(function(a, b) {return a.phone.localeCompare(b.phone);} )
+            }
+
+            if (sort == 'about') {
+                data = data.sort(function(a, b) {return a.about.localeCompare(b.about);} )
+            }
+
+            if (sort == 'eyeColor') {
+                data = data.sort(function(a, b) {return a.eyeColor.localeCompare(b.eyeColor);} )
+            }
+        }
+
+        // get container element
+        let container = document.querySelector('#container');
+
+        // all html will be stored in html variable
+        let html = '<table>';
+        html += '<tr><th width="20%">Name <a href="#" onClick="renderTable(data, \'name\');">[sort]</a></th><th width="25%">Phone <a href="#" onClick="renderTable(data, \'phone\');">[sort]</a></th><th>About <a href="#" onClick="renderTable(data, \'about\');">[sort]</a></th><th>Eye <a href="#" onClick="renderTable(data, \'eyeColor\');">[sort]</a></th></tr>';
+        for (let user of data) {
+            html += 
+                '<tr>' + 
+                    '<td onClick="edit(this);">' + user.name.firstName + ' ' + user.name.lastName + '</td>' + 
+                    '<td onClick="edit(this);">' + user.phone + '</td>' + 
+                    '<td onClick="edit(this);" class="about"><p class="truncate-overflow">' + user.about + '</p></td>' + 
+                    //'<td style="background-color: ' + user.eyeColor + '">' + user.eyeColor + '</td>' +
+                    '<td onClick="edit(this);">' + user.eyeColor + '</td>' + 
+                '</tr>';
+        }
+
+        // close table tag
+        html += '</table>';
+
+        // put html code into container element
+        container.innerHTML = html;
+
+        // srtip too long strings
+        stripStrings();
+    }
+
+    function stopStringRender(str) {
+        el = document.getElementById('calculator');
+        td = document.getElementsByClassName('about')[0];
+        stringsCounter = 1;
+        tmp = '';
+        partToShow = '';
+
+        for (word of str.split(' ')) {
+            tmp += word + ' ';
+            el.textContent = tmp;
+            // some magical pixel constant here-\/-
+            if (el.clientWidth > td.clientWidth-35) {
+                stringsCounter++;
+                tmp = word;
+                //el.textContent = tmp;
+            }
+            if (stringsCounter > 2) {
+                break;
+            }
+            partToShow += word + ' ';
+        }
+        return partToShow + '...' + '<br><span class="link" onClick="showMore(this);">[Show more]</span>';
+    }
+
+    function stripStrings() {
+        aboutSections = document.getElementsByClassName('about');
+
+        for (userAbout of aboutSections) {
+            userAbout.innerHTML = stopStringRender(userAbout.textContent);
+        }
+    }
+
+    function showMore(element) {
+        counter = getNum(element, document.getElementsByClassName('about'));
+        neededSection.textContent = data[counter].about;
+    }
+
+    function getNum(element, pseudoParents) {
+        counter = 0;
+        neededSection = element.parentNode;
+        for (currentSection of pseudoParents) {
+            if (currentSection != neededSection) {
+                counter++;
+            } else {
+                break;
+            }
+        }
+        return counter;
+    }
+
+    function edit(element) {
+        counter = getNum(element, document.getElementsByTagName('tr'));
+        d = data[counter-1];
+        editor = document.getElementById('editor');
+        editor.style.visibility = 'visible';
+        htmlForm = '<h3>Editor</h3><form><textarea>' + d.name.firstName + '</textarea>' + ' <br> ' + 
+        '<textarea>' + d.name.lastName + '</textarea>' + ' <br> ' + 
+        '<textarea>' + d.phone + '</textarea>' + ' <br> ' + 
+        '<textarea>' + d.about + '</textarea>' + ' <br> ' + 
+        '<textarea>' + d.eyeColor + '</textarea><br><input type="submit" value="Edit record"/></form>';
+        editor.innerHTML = htmlForm;
+    }
+
+    renderTable(data);
+
+    </script>
+
+</body>
+</html>
