@@ -29,7 +29,7 @@
             text-align: justify;
         }
 
-        td.about {
+        td.aboutContent {
             position: relative;
         }
 
@@ -87,14 +87,15 @@
         width: 20%;
         float: right;
         position: fixed;
-        right: 0;
         top: 100px;
+        right: 15px;
+        top: 120px;
         background: rgba(255, 255, 255, 0.8);
         padding: 20px;
         border-radius: 10px;
         visibility: hidden;
         text-align: center;
-        border: 1px solid orange
+        border: 1px solid orange;
     }
 
     #container {
@@ -124,10 +125,28 @@
         color: white;
         font-weight: bold;
     }
+
+    #hider {
+        position: absolute;
+        left: 0;
+        top: 100px;
+        border: 1px solid orange;
+        padding: 30px;
+        border-radius: 15px;
+    }
     </style>
 </head>
 <body>
     <h1 align="center">Employees</h1>
+    <div id="hider">
+        Click name of the column to hide it:<br>
+        <ul>
+            <li class="name"><a href="#" onClick="hideSection('name');">name</a></li>
+            <li class="phone" ><a href="#" onClick="hideSection('phone');">phone</a></li>
+            <li class="aboutHeader" ><a href="#" onClick="hideSection('aboutHeader'); hideSection('aboutContent');">about</a></li>
+            <li class="eyeColor" ><a href="#" onClick="hideSection('eyeColor');">eye color</a></li>
+        </ul>
+    </div>
     <div id="container"></div>
     <div id="editor"></div>
     <div id="calculator"></div>
@@ -163,15 +182,15 @@
 
         // all html will be stored in html variable
         let html = '<table>';
-        html += '<tr><th width="20%">Name <a href="#" onClick="renderTable(data, \'name\');">[sort]</a></th><th width="25%">Phone <a href="#" onClick="renderTable(data, \'phone\');">[sort]</a></th><th>About <a href="#" onClick="renderTable(data, \'about\');">[sort]</a></th><th>Eye <a href="#" onClick="renderTable(data, \'eyeColor\');">[sort]</a></th></tr>';
+        html += '<tr><th class="name" width="20%">Name <a href="#" onClick="renderTable(data, \'name\');">[sort]</a></th><th class="phone" width="25%">Phone <a href="#" onClick="renderTable(data, \'phone\');">[sort]</a></th><th class="aboutHeader">About <a href="#" onClick="renderTable(data, \'about\');">[sort]</a></th><th class="eyeColor">Eye <a href="#" onClick="renderTable(data, \'eyeColor\');">[sort]</a></th></tr>';
         for (let user of data) {
             html += 
                 '<tr>' + 
-                    '<td onClick="edit(this);">' + user.name.firstName + ' ' + user.name.lastName + '</td>' + 
-                    '<td onClick="edit(this);">' + user.phone + '</td>' + 
-                    '<td onClick="edit(this);" class="about"><p class="truncate-overflow">' + user.about + '</p></td>' + 
+                    '<td class="name" onClick="edit(this);">' + user.name.firstName + ' ' + user.name.lastName + '</td>' + 
+                    '<td class="phone" onClick="edit(this);">' + user.phone + '</td>' + 
+                    '<td class="aboutContent" onClick="edit(this);" class="about"><p class="truncate-overflow">' + user.about + '</p></td>' + 
                     //'<td style="background-color: ' + user.eyeColor + '">' + user.eyeColor + '</td>' +
-                    '<td onClick="edit(this);">' + user.eyeColor + '</td>' + 
+                    '<td class="eyeColor" onClick="edit(this);">' + user.eyeColor + '</td>' + 
                 '</tr>';
         }
 
@@ -203,7 +222,7 @@
 
     function stopStringRender(str) {
         el = document.getElementById('calculator');
-        td = document.getElementsByClassName('about')[0];
+        td = document.getElementsByClassName('aboutContent')[0];
         stringsCounter = 1;
         tmp = '';
         partToShow = '';
@@ -227,7 +246,7 @@
     }
 
     function stripStrings() {
-        aboutSections = document.getElementsByClassName('about');
+        aboutSections = document.getElementsByClassName('aboutContent');
 
         for (userAbout of aboutSections) {
             userAbout.innerHTML = stopStringRender(userAbout.textContent);
@@ -235,7 +254,7 @@
     }
 
     function showMore(element) {
-        counter = getNum(element, document.getElementsByClassName('about'));
+        counter = getNum(element, document.getElementsByClassName('aboutContent'));
         neededSection.textContent = data[counter].about;
     }
 
@@ -264,6 +283,16 @@
         '<textarea>' + d.eyeColor + '</textarea><br><input type="submit" value="Edit record"/></form>';
         editor.innerHTML = htmlForm;
     }
+
+    //todo: also add showing section
+    function hideSection(section) {
+        elements = document.getElementsByClassName(section);
+        for (let el of elements) {
+            el.style.display = 'none';
+        }
+    }
+
+    // showHideSection('phone');
 
     renderTable(data.slice(0, 10));
 
